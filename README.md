@@ -1,6 +1,31 @@
 # pyoptical
 Imagent optical imaging interface to MNE loading
 
+aim to use fNIRS tools already in MNE, 
+https://mne.tools/dev/auto_tutorials/preprocessing/plot_70_fnirs_processing.html
+
+plan is to load into pandas DataFrame and from there into MNE raw format
+
+Example MNE loading with other NIRS data:
+https://github.com/mne-tools/mne-python/blob/master/mne/io/nirx/nirx.py
+
+Optical imaging workflow currently, including hardware output data format: 
+http://sites.psych.ualberta.ca/kylemathewson/optical-imaging/
+
+Preprocessing routines currently in PPOD (matlab):
+Link unknown
+
+Creation of electrode locations and source detector files in NOMAD (matlab): 
+https://github.com/kylemath/nomad
+
+Coregistration of optical locations on structural MRI in COREG (matlab):
+Link unknown
+
+Matlab optical reconstruction of average data in MOPT3d (matlab) or OPT3d (fortran): 
+https://github.com/kylemath/mopt3d
+
+
+
 Get started
 Install python3 then run in terminal or git Bash: 
 ```
