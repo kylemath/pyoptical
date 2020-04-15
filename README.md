@@ -75,6 +75,7 @@ Push you branch changes to the github repo (the first time it asks you to type s
 git push
 ```
 
+```sh
 # clone a repo from github on your machine
 # see newPyProj.sh for how to setup or see projects readme 
 git clone https://github.com/kylemath/pyoptical
@@ -106,7 +107,7 @@ git pull
 # revert changes you don't like in a branch to the original file before you changed it
 git checkout file.name
 git checkout .
-
+```
 
 
 Suggest we add changes in your branch to the master:
