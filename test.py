@@ -11,24 +11,31 @@ data = pd.read_csv(filename, skiprows=188, sep='\t', index_col='time')
 detectors = ['A', 'B', 'C', 'D']
 fig, ax = plt.subplots()
 
-count_chan = 0
-sumchan = pd.Series(np.arange(len(data)))
 
 # Load distance file
 # Find short channels
 
+# Normalize each channel
 for detector in detectors:
     for x in np.arange(32):
         thischan = detector + '-Ph' + str(x+1)
-        # Normalize each channel
+        tempchan = (data[thischan] - data[thischan].mean()) / data[thischan].std()
+
+# Plot average of all channels
+count_chan = 0
+sumchan = pd.Series(np.arange(len(data)))
+for detector in detectors:
+    for x in np.arange(32):
+        thischan = detector + '-Ph' + str(x+1)
         tempchan = (data[thischan] - data[thischan].mean()) / data[thischan].std()
         count_chan = count_chan + 1
         sumchan.add(tempchan)
-        # tempchan = data[thischan]
-
-# Plot average of all channels
-
 tempchan = tempchan / count_chan
 tempchan.plot(ax=ax)
 plt.show()
+
+# Unwrap Phase
+
+# Remove pulse artifact
+
 
