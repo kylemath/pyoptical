@@ -1,4 +1,6 @@
 # pyoptical
+Sarah S.
+
 Imagent optical imaging interface to MNE loading
 
 aim to use fNIRS tools already in MNE, 
