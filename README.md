@@ -1,6 +1,10 @@
 # pyoptical
 # Imagent optical imaging interface to MNE loading
 
+Jon Kuziek
+
+
+
 Kyle Mathewson
 
 .
