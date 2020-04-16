@@ -16,6 +16,7 @@ Universiy of Alberta
 
 
 
+
 aim to use fNIRS tools already in MNE, 
 https://mne.tools/dev/auto_tutorials/preprocessing/plot_70_fnirs_processing.html
 
