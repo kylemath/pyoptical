@@ -88,11 +88,13 @@ git commit -m 'a message about what changed'
 
 Push you branch changes to the github repo (the first time it asks you to type something extra first
 
-## Git cheatsheet
-
 ```
 git push
 ```
+
+## Git cheatsheet
+
+
 
 ```sh
 # clone a repo from github on your machine
