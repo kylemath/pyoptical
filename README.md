@@ -2,6 +2,7 @@
 Imagent optical imaging interface to MNE loading
 
 Kyle Mathewson
+Sarah Sheldon
 .
 .
 Attention Perception and Performance Lab
