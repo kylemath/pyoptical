@@ -2,6 +2,7 @@
 # Imagent optical imaging interface to MNE loading
 
 Sarah Sheldon
+
 Jon Kuziek
 
 
