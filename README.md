@@ -9,9 +9,6 @@ Jon Kuziek
 
 Kyle Mathewson
 
-.
-
-.
 
 Attention Perception and Performance Lab
 
