@@ -75,6 +75,41 @@ Push you branch changes to the github repo (the first time it asks you to type s
 git push
 ```
 
+```sh
+# clone a repo from github on your machine
+# see newPyProj.sh for how to setup or see projects readme 
+git clone https://github.com/kylemath/pyoptical
+
+# check what branch you are in and if files have changed
+git status
+
+# create new branch
+git branch branchName
+
+# move into another branch (need to save changes first)
+git checkout master
+git checkout branchName
+git checkout -b branchName
+
+# once branch changed add files to commit changes either one at a time or all changes (.)
+git add file.name
+git add .
+
+# commit all those files you added and add a message of what you did
+git commit -m "changes were made"
+
+# push the commit to the remote repo (github.com)
+git push
+
+# pull any new changes from the remote repo (github.com)
+git pull
+
+# revert changes you don't like in a branch to the original file before you changed it
+git checkout file.name
+git checkout .
+```
+
+
 Suggest we add changes in your branch to the master:
 Got to github.com/kylemath/pyoptical after doing the above steps
 click on make pull request
