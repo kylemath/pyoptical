@@ -1,4 +1,6 @@
 # pyoptical
+Sarah S.
+
 Imagent optical imaging interface to MNE loading
 
 Kyle Mathewson
