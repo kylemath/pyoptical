@@ -1,11 +1,10 @@
 # pyoptical
-# Imagent optical imaging interface to MNE loading
+
+## Imagent optical imaging interface to MNE loading
 
 Sarah Sheldon
 
 Jon Kuziek
-
-
 
 Kyle Mathewson
 
