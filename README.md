@@ -41,7 +41,8 @@ https://github.com/kylemath/mopt3d
 
 
 
-Get started
+## Get started
+
 Install python3 then run in terminal or git Bash: 
 ```
 git clone https://github.com/kylemath/pyoptical
@@ -86,6 +87,9 @@ git commit -m 'a message about what changed'
 ```
 
 Push you branch changes to the github repo (the first time it asks you to type something extra first
+
+## Git cheatsheet
+
 ```
 git push
 ```
@@ -124,6 +128,7 @@ git checkout file.name
 git checkout .
 ```
 
+## Contributions
 
 Suggest we add changes in your branch to the master:
 Got to github.com/kylemath/pyoptical after doing the above steps
