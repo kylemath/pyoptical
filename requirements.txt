@@ -23,6 +23,7 @@ MarkupSafe==1.1.1
 matplotlib==3.2.1
 mistune==0.8.4
 mne==0.20.0
+mne-nirs==0.0.1.dev0
 nbconvert==5.6.1
 nbformat==5.0.5
 notebook==6.0.3
