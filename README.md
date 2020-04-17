@@ -1,7 +1,31 @@
 # pyoptical
+
 Jon added this!
 
 Imagent optical imaging interface to MNE loading
+
+## Imagent optical imaging interface to MNE loading
+
+Sarah Sheldon
+
+Jon Kuziek
+
+Kyle Mathewson
+
+
+Attention Perception and Performance Lab
+
+Universiy of Alberta
+
+
+## references
+
+some python brain vis tools:
+http://visbrain.org/auto_examples/index.html
+
+https://nistats.github.io/auto_examples/index.html#first-level-analysis-examples
+
+https://github.com/neurolib-dev/neurolib
 
 aim to use fNIRS tools already in MNE, 
 https://mne.tools/dev/auto_tutorials/preprocessing/plot_70_fnirs_processing.html
@@ -28,7 +52,8 @@ https://github.com/kylemath/mopt3d
 
 
 
-Get started
+## Get started
+
 Install python3 then run in terminal or git Bash: 
 ```
 git clone https://github.com/kylemath/pyoptical
@@ -73,9 +98,14 @@ git commit -m 'a message about what changed'
 ```
 
 Push you branch changes to the github repo (the first time it asks you to type something extra first
+
 ```
 git push
 ```
+
+## Git cheatsheet
+
+
 
 ```sh
 # clone a repo from github on your machine
@@ -111,6 +141,7 @@ git checkout file.name
 git checkout .
 ```
 
+## Contributions
 
 Suggest we add changes in your branch to the master:
 Got to github.com/kylemath/pyoptical after doing the above steps
