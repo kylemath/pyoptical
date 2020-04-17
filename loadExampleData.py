@@ -143,37 +143,49 @@ epochs = mne.Epochs(raw_haemo, events, event_id=event_dict,
 
 topomap_args = dict(extrapolate='local')
 
-fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(9, 5))
-vmin, vmax, ts = -8, 8, 9.0
+# fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(9, 5))
+# vmin, vmax, ts = -8, 8, 9.0
 
-evoked_left = epochs['Tapping/Left'].average()
-evoked_right = epochs['Tapping/Right'].average()
+# evoked_left = epochs['Tapping/Left'].average()
+# evoked_right = epochs['Tapping/Right'].average()
 
-evoked_left.plot_topomap(ch_type='hbo', times=ts, axes=axes[0, 0],
-						vmin=vmin, vmax=vmax, colorbar=False,
-						**topomap_args)
-evoked_left.plot_topomap(ch_type='hbr', times=ts, axes=axes[1, 0],
-						vmin=vmin, vmax=vmax, colorbar=False,
-						**topomap_args)
-evoked_right.plot_topomap(ch_type='hbo', times=ts, axes=axes[0, 1], 
-						vmin=vmin, vmax=vmax, colorbar=False,
-						**topomap_args)
-evoked_right.plot_topomap(ch_type='hbr', times=ts, axes=axes[1, 1], 
-						vmin=vmin, vmax=vmax, colorbar=False,
-						**topomap_args)
+# evoked_left.plot_topomap(ch_type='hbo', times=ts, axes=axes[0, 0],
+# 						vmin=vmin, vmax=vmax, colorbar=False,
+# 						**topomap_args)
+# evoked_left.plot_topomap(ch_type='hbr', times=ts, axes=axes[1, 0],
+# 						vmin=vmin, vmax=vmax, colorbar=False,
+# 						**topomap_args)
+# evoked_right.plot_topomap(ch_type='hbo', times=ts, axes=axes[0, 1], 
+# 						vmin=vmin, vmax=vmax, colorbar=False,
+# 						**topomap_args)
+# evoked_right.plot_topomap(ch_type='hbr', times=ts, axes=axes[1, 1], 
+# 						vmin=vmin, vmax=vmax, colorbar=False,
+# 						**topomap_args)
 
-evoked_diff = mne.combine_evoked([evoked_left, -evoked_right], weights='equal')
+# evoked_diff = mne.combine_evoked([evoked_left, -evoked_right], weights='equal')
 
-evoked_diff.plot_topomap(ch_type='hbo', times=ts, axes=axes[0, 2],
-						vmin=vmin, vmax=vmax,
-						**topomap_args)
-evoked_diff.plot_topomap(ch_type='hbr', times=ts, axes=axes[1, 2], 
-						vmin=vmin, vmax=vmax, 
-						**topomap_args)
+# evoked_diff.plot_topomap(ch_type='hbo', times=ts, axes=axes[0, 2],
+# 						vmin=vmin, vmax=vmax,
+# 						**topomap_args)
+# evoked_diff.plot_topomap(ch_type='hbr', times=ts, axes=axes[1, 2], 
+# 						vmin=vmin, vmax=vmax, 
+# 						**topomap_args)
 
-for column, condition in enumerate(
-		['Tapping Left', 'Tapping Right', 'Left-Right']):
-	for row, chroma in enumerate(['HbO', 'HbR']):
-		axes[row, column].set_title('{}: {}'.format(chroma, condition))
+# for column, condition in enumerate(
+# 		['Tapping Left', 'Tapping Right', 'Left-Right']):
+# 	for row, chroma in enumerate(['HbO', 'HbR']):
+# 		axes[row, column].set_title('{}: {}'.format(chroma, condition))
 
-plt.show()
+# plt.show()
+
+
+fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(6, 4))
+mne.viz.plot_evoked_topo(epochs['Left'].average(picks='hbo'), color='b',
+                         axes=axes, legend=False)
+mne.viz.plot_evoked_topo(epochs['Right'].average(picks='hbo'), color='r',
+                         axes=axes, legend=False)
+
+# Tidy the legend
+leg_lines = [line for line in axes.lines if line.get_c() == 'b'][:1]
+leg_lines.append([line for line in axes.lines if line.get_c() == 'r'][0])
+fig.legend(leg_lines, ['Left', 'Right'], loc='lower right')
