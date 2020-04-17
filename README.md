@@ -18,8 +18,11 @@ Universiy of Alberta
 
 some python brain vis tools:
 http://visbrain.org/auto_examples/index.html
+
 https://nistats.github.io/auto_examples/index.html#first-level-analysis-examples
+
 https://github.com/neurolib-dev/neurolib
+
 
 aim to use fNIRS tools already in MNE, 
 https://mne.tools/dev/auto_tutorials/preprocessing/plot_70_fnirs_processing.html
