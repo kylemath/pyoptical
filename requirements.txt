@@ -13,6 +13,7 @@ ipython-genutils==0.2.0
 ipywidgets==7.5.1
 jedi==0.16.0
 Jinja2==2.11.1
+joblib==0.14.1
 jsonschema==3.2.0
 jupyter==1.0.0
 jupyter-client==6.1.2
@@ -26,6 +27,9 @@ mne==0.20.0
 mne-nirs==0.0.1.dev0
 nbconvert==5.6.1
 nbformat==5.0.5
+nibabel==3.0.2
+nilearn==0.6.2
+nistats==0.0.1rc0
 notebook==6.0.3
 numpy==1.18.2
 pandas==1.0.3
@@ -44,9 +48,11 @@ pytz==2019.3
 pyzmq==19.0.0
 qtconsole==4.7.2
 QtPy==1.9.0
+scikit-learn==0.22.2.post1
 scipy==1.4.1
 Send2Trash==1.5.0
 six==1.14.0
+sklearn==0.0
 terminado==0.8.3
 testpath==0.4.4
 tornado==6.0.4
