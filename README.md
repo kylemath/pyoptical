@@ -1,9 +1,5 @@
 # pyoptical
 
-Jon added this!
-
-Imagent optical imaging interface to MNE loading
-
 ## Imagent optical imaging interface to MNE loading
 
 Sarah Sheldon
