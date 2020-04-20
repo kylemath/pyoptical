@@ -29,13 +29,18 @@ Created on Fri Apr 17 11:46:32 2020
 import mne
 
 def boxy2mne(mtg_file,tol_file):
-    ###load .mtg files###
+    
+    ###need to have function determine sampling rate automatically, eventually
+    srate = 39.0625
+    
+    ###set up some variables###
     chan_num = []
     source_label = []
     detect_label = []
     chan_wavelength = []
     chan_modulation = []
     
+    ###load and read each line of the .mtg file###
     with open(mtg_file,'r') as data:
         for i_ignore in range(2):
             next(data)
@@ -47,48 +52,51 @@ def boxy2mne(mtg_file,tol_file):
             chan_wavelength.append(wavelength)
             chan_modulation.append(modulation)
     
-    ###read .tol file###
+    ###load and read .tol file###
     chan_label = []
     coords = []
     with open(tol_file,'r') as data:
         for i_line in data:
             label, X, Y, Z = i_line.split()
             chan_label.append(label)
-            coords.append([X,Y,Z])
+            ###convert coordinates from mm to m##
+            coords.append([(float(X)*0.001),(float(Y)*0.001),(float(Z)*0.001)])
         
-    # unique_wavelengths = set(chan_wavelength)
+    ###get coordinates for sources###
     source_coords = []
     for i_chan in source_label:
         if i_chan in chan_label:
             chan_index = chan_label.index(i_chan)
             source_coords.append(coords[chan_index])
             
+    ###get coordinates for detectors###
     detect_coords = []
     for i_chan in detect_label:
         if i_chan in chan_label:
             chan_index = chan_label.index(i_chan)
             detect_coords.append(coords[chan_index])
         
+    ###combine coordinates and label our channels###
     chan_coords = []
     chan_labels = []
     for i_coord in range(len(source_coords)):
         chan_coords.append(source_coords[i_coord] + detect_coords[i_coord])
-        chan_labels.append(source_label[i_coord] + '-' + detect_label[i_coord])
-        
-    srate = 39.0625
+        chan_labels.append(source_label[i_coord] + '_' + detect_label[i_coord]
+                           + ' ' + chan_wavelength[i_coord])
     
+    ###create info structure###
     info = mne.create_info(chan_labels,srate)
-    print(info)
 
+    ###place out coordinates and wavelengths for each channel###
     for i_chan in range(len(chan_labels)):
         for i_coord in range(3):
             info['chs'][i_chan]['loc'][3+i_coord] = float(chan_coords[i_chan][i_coord])
             info['chs'][i_chan]['loc'][6+i_coord] = float(chan_coords[i_chan][3 + i_coord])
+        info['chs'][i_chan]['loc'][9] = float(chan_wavelength[i_coord])
             
-    # test['chs'][0]['loc'][3]
-    # chan_coords[0][0]
+    ###use all channels and get our source-detector distances###
     picks = [x for x in range(len(chan_labels))]
     dists = mne.preprocessing.nirs.source_detector_distances(info, picks = picks)
     
-    return dists
+    return info, dists
     
