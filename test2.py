@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np 
 from utils import boxy2mne
 
-boxy_file = "data/emm0311.001"
+boxy_file = "data/emm0311a.001"
 mtg_file = "data/emm0311_good.mtg"
 tol_file = "data/emm0311.tol"
 
