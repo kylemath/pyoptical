@@ -223,5 +223,7 @@ def boxy2mne(boxy_file,mtg_file,tol_file):
     dc = mne.io.RawArray(raw_dc, info)
     ph = mne.io.RawArray(raw_ph, info)
     
-    return ac, dc, ph, dists
+    all_data = {'AC': ac, 'DC':dc, 'Ph':ph, 'Dist':dists}
+    
+    return all_data
     
