@@ -9,7 +9,7 @@ import mne
 import numpy as np
 import pandas as pd
 
-def boxy2mne(boxy_file,mtg_file,tol_file):
+def boxy2mne(*,boxy_file=None,mtg_file=None,coord_file=None):
     
 # =============================================================================
 #     ready raw data from boxy file
@@ -45,8 +45,7 @@ def boxy2mne(boxy_file,mtg_file,tol_file):
     ###now let's go through and parse our raw data###  
     raw_data = pd.read_csv(boxy_file, skiprows=start_line, sep='\t')
     
-    ###only go up to 'J' since that the max number of detectors we can have###
-    ###for now anyway###
+    ###detectors, sources, and data types###
     detectors = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 
                  'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
                  'Y', 'Z']
@@ -57,7 +56,7 @@ def boxy2mne(boxy_file,mtg_file,tol_file):
     ###this will check to see which style the data is saved###
     ###seems to also work with older boxy files###
     if 'exmux' in raw_data.columns:
-        filetype = 1
+        filetype = 'non-parsed'
         
         ###drop the last line as this is just '#DATA ENDS'###
         raw_data = raw_data.drop([len(raw_data)-1])
@@ -71,7 +70,7 @@ def boxy2mne(boxy_file,mtg_file,tol_file):
         raw_dc = np.zeros((detect_num*mux_num,int(len(raw_data)/mux_num)))
         raw_ph = np.zeros((detect_num*mux_num,int(len(raw_data)/mux_num)))
     else:
-        filetype = 2
+        filetype = 'parsed'
         
         ###drop the last line as this is just '#DATA ENDS'###
         ###also drop the first line since this is empty###
@@ -109,7 +108,7 @@ def boxy2mne(boxy_file,mtg_file,tol_file):
                 index_loc = detectors.index(i_detect)*mux_num + (i_source-1)
                 
                 ###need to treat our filetypes differently###
-                if filetype == 1:
+                if filetype == 'non-parsed':
                     
                     ###filetype saves timepoints in groups###
                     ###this should account for that###
@@ -125,7 +124,7 @@ def boxy2mne(boxy_file,mtg_file,tol_file):
                         raw_dc[index_loc,:] = raw_data[channel][time_points].to_numpy()
                     elif data_types.index(i_data) == 2:
                         raw_ph[index_loc,:] = raw_data[channel][time_points].to_numpy()
-                else:
+                elif filetype == 'parsed':
                     
                     ###determine which channel to look for###
                     channel = i_detect + '-' + i_data + str(i_source)
@@ -161,15 +160,36 @@ def boxy2mne(boxy_file,mtg_file,tol_file):
             chan_wavelength.append(wavelength)
             chan_modulation.append(modulation)
     
-    ###load and read .tol file###
+    ###check if we are given a .tol or .elp file###
     chan_label = []
     coords = []
-    with open(tol_file,'r') as data:
-        for i_line in data:
-            label, X, Y, Z = i_line.split()
-            chan_label.append(label)
-            ###convert coordinates from mm to m##
-            coords.append([(float(X)*0.001),(float(Y)*0.001),(float(Z)*0.001)])
+    if coord_file[-3:] == 'elp':
+        get_label = 0
+        get_coords = 0
+        ###load and read .elp file###
+        with open(coord_file,'r') as data:
+            for i_line in data:
+                ###check where sensor info starts###
+                if '//Sensor name' in i_line:
+                    get_label = 1
+                elif get_label == 1:
+                    ###grab the part after '%N' for the label###
+                    label = i_line.split()[1]
+                    chan_label.append(label)
+                    get_label = 0
+                    get_coords = 1
+                elif get_coords == 1:
+                    X, Y, Z = i_line.split()
+                    coords.append([float(X),float(Y),float(Z)])
+                    get_coords = 0
+    elif coord_file[-3:] == 'tol':
+        ###load and read .tol file###
+        with open(coord_file,'r') as data:
+            for i_line in data:
+                label, X, Y, Z = i_line.split()
+                chan_label.append(label)
+                ###convert coordinates from mm to m##
+                coords.append([(float(X)*0.001),(float(Y)*0.001),(float(Z)*0.001)])
         
     ###get coordinates for sources###
     source_coords = []
@@ -186,12 +206,15 @@ def boxy2mne(boxy_file,mtg_file,tol_file):
             detect_coords.append(coords[chan_index])
         
     ###combine coordinates and label our channels###
+    ###will label them based on ac, dc, and ph data###
     chan_coords = []
-    chan_labels = []
-    for i_coord in range(len(source_coords)):
-        chan_coords.append(source_coords[i_coord] + detect_coords[i_coord])
-        chan_labels.append(source_label[i_coord] + '_' + detect_label[i_coord]
-                           + ' ' + chan_wavelength[i_coord])
+    all_chan_labels = []
+    data_types = ['AC','DC','Ph']
+    for i_type in data_types:
+        for i_coord in range(len(source_coords[0:len(raw_ac)])):
+            chan_coords.append(source_coords[i_coord] + detect_coords[i_coord])
+            all_chan_labels.append(i_type + ' ' + source_label[i_coord] + 
+                               detect_label[i_coord] + ' ' + chan_wavelength[i_coord])
         
 # =============================================================================
 #     so this has been added because all the .mtg files I have contain
@@ -199,31 +222,25 @@ def boxy2mne(boxy_file,mtg_file,tol_file):
 #     than a single boxy data file. this function is only designed to take
 #     a single boxy file. the below code is just a work around for testing.
 # =============================================================================
-    if len(chan_labels) != len(raw_ac):
-        chan_labels = chan_labels[0:len(raw_ac)]  
+    # if len(all_chan_labels) != len(raw_ac)*3:
+    #     all_chan_labels = all_chan_labels[0:len(raw_ac)*3]  
 # =============================================================================
 #         
 # =============================================================================
     
     ###create info structure###
-    info = mne.create_info(chan_labels,srate)
+    info = mne.create_info(all_chan_labels,srate)
 
-    ###place out coordinates and wavelengths for each channel###
-    for i_chan in range(len(chan_labels)):
+    ###place our coordinates and wavelengths for each channel###
+    for i_chan in range(len(all_chan_labels)):
         for i_coord in range(3):
+            info['chs'][i_chan]['loc'][i_coord] = float(
+                np.mean([chan_coords[i_chan][i_coord],chan_coords[i_chan][3 + i_coord]]))
             info['chs'][i_chan]['loc'][3+i_coord] = float(chan_coords[i_chan][i_coord])
             info['chs'][i_chan]['loc'][6+i_coord] = float(chan_coords[i_chan][3 + i_coord])
         info['chs'][i_chan]['loc'][9] = float(chan_wavelength[i_coord])
-            
-    ###use all channels and get our source-detector distances###
-    picks = [x for x in range(len(chan_labels))]
-    dists = mne.preprocessing.nirs.source_detector_distances(info, picks = picks)
     
-    ac = mne.io.RawArray(raw_ac, info)
-    dc = mne.io.RawArray(raw_dc, info)
-    ph = mne.io.RawArray(raw_ph, info)
+    raw_data = mne.io.RawArray(np.append(raw_ac, np.append(raw_dc, raw_ph, axis=0),axis=0), info)
     
-    all_data = {'AC': ac, 'DC':dc, 'Ph':ph, 'Dist':dists}
-    
-    return all_data
+    return raw_data
     
