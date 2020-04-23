@@ -18,74 +18,90 @@ print("Example sensor information: ", raw_intensity.info['chs'][2])
 
 # raw_intensity.plot_sensors()
 
+for i in np.arange(24):
+	print(raw_intensity.info['chs'][i]['loc'][3:6])
 
-## Selecting channels 
+## View locatoin of sensors over brain surface
 
-picks = mne.pick_types(raw_intensity.info, meg=False, fnirs=True)
-print("Channels to pull out: ", picks)
+subjects_dir = mne.datasets.sample.data_path() + '/subjects'
 
-dists = mne.preprocessing.nirs.source_detector_distances(
-	raw_intensity.info, picks=picks)
-print("Channel distances: ", dists)
+fig = mne.viz.create_3d_figure(size=(800, 600), bgcolor='white')
+fig = mne.viz.plot_alignment(raw_intensity.info, show_axes=True,
+							subject='fsaverage',
+							trans='fsaverage', surfaces=['brain'],
+							fnirs=['channels', 'pairs'],
+							subjects_dir=subjects_dir, fig=fig)
+mne.viz.set_3d_view(figure=fig, azimuth=20, elevation=55, distance=0.6)
+plt.show()
 
-raw_intensity.pick(picks[dists > 0.01])
-print("Long enough channels: ", raw_intensity)
 
-# raw_intensity.plot(n_channels=len(raw_intensity.ch_names), 
-# 					duration=500, show_scrollbars=False)
-# plt.show()
+# ## Selecting channels 
 
-## Converting to optical density
+# picks = mne.pick_types(raw_intensity.info, meg=False, fnirs=True)
+# print("Channels to pull out: ", picks)
 
-raw_od = mne.preprocessing.nirs.optical_density(raw_intensity)
-# raw_od.plot(n_channels=len(raw_od.ch_names),
-# 			duration=500, show_scrollbars=False)
-# plt.show()
+# dists = mne.preprocessing.nirs.source_detector_distances(
+# 	raw_intensity.info, picks=picks)
+# print("Channel distances: ", dists)
 
-## Evaluating the quality of the data
+# raw_intensity.pick(picks[dists > 0.01])
+# print("Long enough channels: ", raw_intensity)
 
-sci = mne.preprocessing.nirs.scalp_coupling_index(raw_od)
-# fig, ax = plt.subplots()
-# ax.hist(sci)
-# ax.set(xlabel='Scalp Coupling Index', ylabel='Count', xlim=[0, 1])
-# plt.show()
+# # raw_intensity.plot(n_channels=len(raw_intensity.ch_names), 
+# # 					duration=500, show_scrollbars=False)
+# # plt.show()
 
-## Converting from optical density to haemoglobin
+# ## Converting to optical density
 
-raw_haemo = mne.preprocessing.nirs.beer_lambert_law(raw_od)
-# raw_haemo.plot(n_channels=len(raw_haemo.ch_names),
-# 				duration=500, show_scrollbars=False)
-# plt.show()
+# raw_od = mne.preprocessing.nirs.optical_density(raw_intensity)
+# # raw_od.plot(n_channels=len(raw_od.ch_names),
+# # 			duration=500, show_scrollbars=False)
+# # plt.show()
 
-## Remove heart rate from signal
+# ## Evaluating the quality of the data
 
-# fig = raw_haemo.plot_psd(average=True)
-# fig.suptitle('Before filtering', weight='bold', size='x-large')
-# fig.subplots_adjust(top=0.88)
-raw_haemo = raw_haemo.filter(0.05, 0.7, h_trans_bandwidth=0.2, 
-							l_trans_bandwidth=0.02)
+# sci = mne.preprocessing.nirs.scalp_coupling_index(raw_od)
+# # fig, ax = plt.subplots()
+# # ax.hist(sci)
+# # ax.set(xlabel='Scalp Coupling Index', ylabel='Count', xlim=[0, 1])
+# # plt.show()
+
+# ## Converting from optical density to haemoglobin
+
+# raw_haemo = mne.preprocessing.nirs.beer_lambert_law(raw_od)
+# # raw_haemo.plot(n_channels=len(raw_haemo.ch_names),
+# # 				duration=500, show_scrollbars=False)
+# # plt.show()
+
+# ## Remove heart rate from signal
+
+# # fig = raw_haemo.plot_psd(average=True)
+# # fig.suptitle('Before filtering', weight='bold', size='x-large')
+# # fig.subplots_adjust(top=0.88)
+# raw_haemo = raw_haemo.filter(0.05, 0.7, h_trans_bandwidth=0.2, 
+# 							l_trans_bandwidth=0.02)
 # fig = raw_haemo.plot_psd(average=True)
 # fig.suptitle('After filtering', weight='bold', size='x-large')
 # fig.subplots_adjust(top=0.88)
 
 ## Extract Epochs
 
-events, _ = mne.events_from_annotations(raw_haemo, event_id={'1.0': 1,
-															 '2.0': 2,
-															 '3.0': 3})
-event_dict = {'Control': 1, 'Tapping/Left': 2, 'Tapping/Right': 3}
-# fig = mne.viz.plot_events(events, event_id=event_dict, 
-# 						sfreq=raw_haemo.info['sfreq'])
-# fig.subplots_adjust(right=0.7)
+# events, _ = mne.events_from_annotations(raw_haemo, event_id={'1.0': 1,
+# 															 '2.0': 2,
+# 															 '3.0': 3})
+# event_dict = {'Control': 1, 'Tapping/Left': 2, 'Tapping/Right': 3}
+# # fig = mne.viz.plot_events(events, event_id=event_dict, 
+# # 						sfreq=raw_haemo.info['sfreq'])
+# # fig.subplots_adjust(right=0.7)
 
-reject_criteria = dict(hbo=80e-6)
-tmin, tmax = -5, 15
+# reject_criteria = dict(hbo=80e-6)
+# tmin, tmax = -5, 15
 
-epochs = mne.Epochs(raw_haemo, events, event_id=event_dict, 
-					tmin=tmin, tmax=tmax, 
-					reject=reject_criteria, reject_by_annotation=True, 
-					proj=True, baseline=(None, 0), preload=True,
-					detrend=None, verbose=True)
+# epochs = mne.Epochs(raw_haemo, events, event_id=event_dict, 
+# 					tmin=tmin, tmax=tmax, 
+# 					reject=reject_criteria, reject_by_annotation=True, 
+# 					proj=True, baseline=(None, 0), preload=True,
+# 					detrend=None, verbose=True)
 
 # plt.show()
 
@@ -141,7 +157,7 @@ epochs = mne.Epochs(raw_haemo, events, event_id=event_dict,
 
 ## Compare conditions
 
-topomap_args = dict(extrapolate='local')
+# topomap_args = dict(extrapolate='local')
 
 # fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(9, 5))
 # vmin, vmax, ts = -8, 8, 9.0
@@ -179,13 +195,13 @@ topomap_args = dict(extrapolate='local')
 # plt.show()
 
 
-fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(6, 4))
-mne.viz.plot_evoked_topo(epochs['Left'].average(picks='hbo'), color='b',
-                         axes=axes, legend=False)
-mne.viz.plot_evoked_topo(epochs['Right'].average(picks='hbo'), color='r',
-                         axes=axes, legend=False)
+# fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(6, 4))
+# mne.viz.plot_evoked_topo(epochs['Left'].average(picks='hbo'), color='b',
+#                          axes=axes, legend=False)
+# mne.viz.plot_evoked_topo(epochs['Right'].average(picks='hbo'), color='r',
+#                          axes=axes, legend=False)
 
-# Tidy the legend
-leg_lines = [line for line in axes.lines if line.get_c() == 'b'][:1]
-leg_lines.append([line for line in axes.lines if line.get_c() == 'r'][0])
-fig.legend(leg_lines, ['Left', 'Right'], loc='lower right')
+# # Tidy the legend
+# leg_lines = [line for line in axes.lines if line.get_c() == 'b'][:1]
+# leg_lines.append([line for line in axes.lines if line.get_c() == 'r'][0])
+# fig.legend(leg_lines, ['Left', 'Right'], loc='lower right')
