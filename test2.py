@@ -27,3 +27,6 @@ dists_ac = mne.preprocessing.nirs.source_detector_distances(raw_data.info, picks
 dists_dc = mne.preprocessing.nirs.source_detector_distances(raw_data.info, picks = ch_list_dc)
 dists_ph = mne.preprocessing.nirs.source_detector_distances(raw_data.info, picks = ch_list_ph)
 dists_all = mne.preprocessing.nirs.source_detector_distances(raw_data.info, picks = ch_list_all)
+
+###get our events###
+events = mne.find_events(raw_data, stim_channel='Markers')
