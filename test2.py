@@ -28,9 +28,6 @@ ch_list_ac = np.asarray([chan['scanno']-1 for chan in raw_data.info['chs'] if 'A
 # plt.show()
 ###calculate our distances (should be the same across data types###)
 dists_ac = mne.preprocessing.nirs.source_detector_distances(raw_data.info, picks = ch_list_ac)
-# dists_dc = mne.preprocessing.nirs.source_detector_distances(raw_data.info, picks = ch_list_dc)
-# dists_ph = mne.preprocessing.nirs.source_detector_distances(raw_data.info, picks = ch_list_ph)
-# dists_all = mne.preprocessing.nirs.source_detector_distances(raw_data.info, picks = ch_list_all)
 
 for i in np.arange(24):
 	print(raw_data.info['chs'][i]['loc'][3:6])
@@ -46,3 +43,9 @@ fig = mne.viz.plot_alignment(raw_data.info, show_axes=True,
 							subjects_dir=subjects_dir, fig=fig)
 mne.viz.set_3d_view(figure=fig, azimuth=20, elevation=55, distance=0.6)
 plt.show()
+dists_dc = mne.preprocessing.nirs.source_detector_distances(raw_data.info, picks = ch_list_dc)
+dists_ph = mne.preprocessing.nirs.source_detector_distances(raw_data.info, picks = ch_list_ph)
+dists_all = mne.preprocessing.nirs.source_detector_distances(raw_data.info, picks = ch_list_all)
+
+###get our events###
+events = mne.find_events(raw_data, stim_channel='Markers')

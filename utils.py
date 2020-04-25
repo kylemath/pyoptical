@@ -138,7 +138,7 @@ def boxy2mne(*,boxy_file=None,mtg_file=None,coord_file=None):
                         raw_ph[index_loc,:] = raw_data[channel].to_numpy()
     
 # =============================================================================
-#     read source and electrode locations from .mtg and .tol files
+#     read source and electrode locations from .mtg and .tol/.elp files
 # =============================================================================
     
     ###set up some variables###
@@ -163,12 +163,16 @@ def boxy2mne(*,boxy_file=None,mtg_file=None,coord_file=None):
     ###check if we are given a .tol or .elp file###
     chan_label = []
     coords = []
+    fiducial_coords = []
     if coord_file[-3:] == 'elp':
         get_label = 0
         get_coords = 0
         ###load and read .elp file###
         with open(coord_file,'r') as data:
             for i_line in data:
+                ###first let's get our fiducial coordinates###
+                if '%F' in i_line:
+                    fiducial_coords.append(i_line.split()[1:])
                 ###check where sensor info starts###
                 if '//Sensor name' in i_line:
                     get_label = 1
@@ -207,40 +211,48 @@ def boxy2mne(*,boxy_file=None,mtg_file=None,coord_file=None):
         
     ###combine coordinates and label our channels###
     ###will label them based on ac, dc, and ph data###
-    chan_coords = []
+    all_chan_coords = []
     all_chan_labels = []
+    all_chan_wavelength = []
+    all_chan_data_type = []
     data_types = ['AC','DC','Ph']
+    total_chans = detect_num*mux_num
     for i_type in data_types:
-        for i_coord in range(len(source_coords[0:len(raw_ac)])):
-            chan_coords.append(source_coords[i_coord] + detect_coords[i_coord])
-            all_chan_labels.append(i_type + ' ' + source_label[i_coord] + 
-                               detect_label[i_coord] + ' ' + chan_wavelength[i_coord])
-        
-# =============================================================================
-#     so this has been added because all the .mtg files I have contain
-#     multiple blocks/data files, so a montage file then contains more channels 
-#     than a single boxy data file. this function is only designed to take
-#     a single boxy file. the below code is just a work around for testing.
-# =============================================================================
-    # if len(all_chan_labels) != len(raw_ac)*3:
-    #     all_chan_labels = all_chan_labels[0:len(raw_ac)*3]  
-# =============================================================================
-#         
-# =============================================================================
+        for i_coord in range(len(source_coords[0:total_chans])):
+            all_chan_coords.append(np.mean(
+                np.vstack((source_coords[i_coord], detect_coords[i_coord])),
+                axis=0).tolist() + source_coords[i_coord] + 
+                detect_coords[i_coord] + [chan_wavelength[i_coord]] + [0] + [0])
+            all_chan_labels.append(source_label[i_coord] + ' ' + detect_label[i_coord])
+            all_chan_data_type.append(i_type)
+            all_chan_wavelength.append(chan_wavelength[i_coord])
     
+    ###add an extra channel for our triggers###
+    all_chan_labels.append('Markers')
+    all_chan_data_type.append('Markers')
+
     ###create info structure###
-    info = mne.create_info(all_chan_labels,srate)
+    info = mne.create_info(all_chan_labels,srate, ch_types='fnirs_raw')
+    
+    ###add data type and channel wavelength to info###
+    info.update(chan_data_type=all_chan_data_type, chan_wavelength=all_chan_wavelength)
 
     ###place our coordinates and wavelengths for each channel###
-    for i_chan in range(len(all_chan_labels)):
-        for i_coord in range(3):
-            info['chs'][i_chan]['loc'][i_coord] = float(
-                np.mean([chan_coords[i_chan][i_coord],chan_coords[i_chan][3 + i_coord]]))
-            info['chs'][i_chan]['loc'][3+i_coord] = float(chan_coords[i_chan][i_coord])
-            info['chs'][i_chan]['loc'][6+i_coord] = float(chan_coords[i_chan][3 + i_coord])
-        info['chs'][i_chan]['loc'][9] = float(chan_wavelength[i_coord])
+    for i_chan in range(len(all_chan_labels)-1):
+        info['chs'][i_chan]['loc'] = np.asarray(all_chan_coords[i_chan],dtype=np.float64)  
     
-    raw_data = mne.io.RawArray(np.append(raw_ac, np.append(raw_dc, raw_ph, axis=0),axis=0), info)
+    ###now combine our data types into a single array###
+    all_data = np.append(raw_ac, np.append(raw_dc, raw_ph, axis=0),axis=0)
+    
+    ###add our markers to the data array based on filetype###
+    if filetype == 'non-parsed':
+        markers = digaux[np.arange(0,len(digaux),mux_num)]
+    elif filetype == 'parsed':
+        markers = digaux  
+    all_data = np.vstack((all_data, markers))
+    
+    ###create our raw data object###
+    raw_data = mne.io.RawArray(all_data, info)
     
     return raw_data
     
