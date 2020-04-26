@@ -28,13 +28,22 @@ if allPlot:
 	fig.gca().view_init(azim=70, elev=15)
 	ten_twenty_montage.plot(kind='topomap', show_names=True)
 
-# if allPlot: 
-fig = plt.figure()
-ax2d = fig.add_subplot(121)
-ax3d = fig.add_subplot(122, projection='3d')
-raw.plot_sensors(ch_type='eeg', axes=ax2d)
-raw.plot_sensors(ch_type='eeg', axes=ax3d, kind='3d')
-ax3d.view_init(azim=70, elev=15)
+if allPlot: 
+	fig = plt.figure()
+	ax2d = fig.add_subplot(121)
+	ax3d = fig.add_subplot(122, projection='3d')
+	raw.plot_sensors(ch_type='eeg', axes=ax2d)
+	raw.plot_sensors(ch_type='eeg', axes=ax3d, kind='3d')
+	ax3d.view_init(azim=70, elev=15)
+
+subjects_dir = mne.datasets.sample.data_path() + '/subjects'
+fig = mne.viz.plot_alignment(raw.info, trans='fsaverage', dig=False, eeg=True, 
+							surfaces=['brain'], subject='fsaverage', meg=['sensors'],
+							coord_frame='meg', subjects_dir=subjects_dir)
+mne.viz.set_3d_view(fig, azimuth=50, elevation=90, distance=0.5)
+
+
+
 
 
 plt.show()
