@@ -12,6 +12,11 @@ coord_file = "data/emm0311.elp"
 raw_data = boxy2mne(boxy_file=boxy_file, mtg_file=mtg_file, coord_file=coord_file)
 
 
+fig = plt.figure()
+ax3d = fig.add_subplot(111, projection='3d')
+raw_data.plot_sensors(ch_type='eeg', axes=ax3d, kind='3d')
+ax3d.view_init(azim=70, elev=15)
+
 
 
 ###grab only channels for each data type###
@@ -38,11 +43,11 @@ for i in np.arange(24):
 
 subjects_dir = mne.datasets.sample.data_path() + '/subjects'
 
-fig = mne.viz.create_3d_figure(size=(800, 600), bgcolor='white')
-fig = mne.viz.plot_alignment(raw_data.info, show_axes=True,
-							subject='fsaverage',
-							trans='fsaverage', surfaces=['brain'],
-							fnirs=['channels', 'pairs'],
-							subjects_dir=subjects_dir, fig=fig)
-mne.viz.set_3d_view(figure=fig, azimuth=20, elevation=55, distance=0.6)
+# fig = mne.viz.create_3d_figure(size=(800, 600), bgcolor='white')
+# fig = mne.viz.plot_alignment(raw_data.info, show_axes=True,
+# 							subject='fsaverage',
+# 							trans='fsaverage', surfaces=['brain'],
+# 							fnirs=['channels', 'pairs'],
+# 							subjects_dir=subjects_dir, fig=fig)
+# mne.viz.set_3d_view(figure=fig, azimuth=20, elevation=55, distance=0.6)
 plt.show()

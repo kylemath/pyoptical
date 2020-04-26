@@ -229,7 +229,7 @@ def boxy2mne(*,boxy_file=None,mtg_file=None,coord_file=None):
 # =============================================================================
     
     ###create info structure###
-    info = mne.create_info(all_chan_labels,srate)
+    info = mne.create_info(ch_names=all_chan_labels,sfreq=srate, ch_types='eeg')
 
     ###place our coordinates and wavelengths for each channel###
     for i_chan in range(len(all_chan_labels)):
@@ -239,7 +239,7 @@ def boxy2mne(*,boxy_file=None,mtg_file=None,coord_file=None):
             info['chs'][i_chan]['loc'][3+i_coord] = float(chan_coords[i_chan][i_coord])
             info['chs'][i_chan]['loc'][6+i_coord] = float(chan_coords[i_chan][3 + i_coord])
         info['chs'][i_chan]['loc'][9] = float(chan_wavelength[i_coord])
-    
+
     raw_data = mne.io.RawArray(np.append(raw_ac, np.append(raw_dc, raw_ph, axis=0),axis=0), info)
     
     return raw_data
