@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Apr 17 11:46:32 2020
+Created on Wed Apr 29 09:53:58 2020
 
 @author: spork
 """
@@ -8,6 +8,10 @@ Created on Fri Apr 17 11:46:32 2020
 import mne
 import numpy as np
 import pandas as pd
+from mne.coreg import coregister_fiducials
+from mne.io.meas_info import read_fiducials
+from mne.datasets import fetch_fsaverage
+import os.path as op
 
 def boxy2mne(*,boxy_file=None,mtg_file=None,coord_file=None):
     
@@ -186,6 +190,8 @@ def boxy2mne(*,boxy_file=None,mtg_file=None,coord_file=None):
                     X, Y, Z = i_line.split()
                     coords.append([float(X),float(Y),float(Z)])
                     get_coords = 0
+        for i_index in range(3):
+            fiducial_coords[i_index] = np.asarray([float(x) for x in fiducial_coords[i_index]])
     elif coord_file[-3:] == 'tol':
         ###load and read .tol file###
         with open(coord_file,'r') as data:
@@ -227,15 +233,37 @@ def boxy2mne(*,boxy_file=None,mtg_file=None,coord_file=None):
             all_chan_data_type.append(i_type)
             all_chan_wavelength.append(chan_wavelength[i_coord])
     
+    ###montage only wants channel coords, so need to grab those, convert to###
+    ###array, then make a dict with labels###
+    mtg_coords = np.empty([len(all_chan_coords),3])
+    for i_chan in range(len(all_chan_coords)):
+        all_chan_coords[i_chan] = np.asarray(all_chan_coords[i_chan],dtype=np.float64)  
+        mtg_coords[i_chan,:] = all_chan_coords[i_chan][:3]
+    chan_dict = dict(zip(all_chan_labels,mtg_coords))
+    
+    ###make our montage###
+    montage = mne.channels.make_dig_montage(ch_pos=chan_dict,coord_frame='head',
+                                            nasion = fiducial_coords[0],
+                                            lpa = fiducial_coords[1], 
+                                            rpa = fiducial_coords[2])
+
     ###add an extra channel for our triggers###
     all_chan_labels.append('Markers')
     all_chan_data_type.append('Markers')
+    all_chan_wavelength.append('Markers')
 
     ###create info structure###
-    info = mne.create_info(all_chan_labels,srate, ch_types='fnirs_raw')
+    info = mne.create_info(all_chan_labels,srate,'eeg')
+    info.update(dig=montage.dig)
+    
+    ###get our fiducials and transform matrix from fsaverage###
+    subjects_dir = op.dirname(fetch_fsaverage())
+    fiducials = read_fiducials(subjects_dir + '\\fsaverage\\bem\\fsaverage-fiducials.fif')
+    trans = coregister_fiducials(info, fiducials[0], tol=0.02)
     
     ###add data type and channel wavelength to info###
-    info.update(chan_data_type=all_chan_data_type, chan_wavelength=all_chan_wavelength)
+    info.update(chan_data_type=all_chan_data_type, chan_wavelength=all_chan_wavelength, 
+                trans=trans)
 
     ###place our coordinates and wavelengths for each channel###
     for i_chan in range(len(all_chan_labels)-1):
