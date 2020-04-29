@@ -1,7 +1,3 @@
-import matplotlib
-matplotlib.use('TkAgg')
-
-from matplotlib import pyplot as plt
 import mne
 from mne.datasets import sample, fetch_fsaverage
 from mne.beamformer import make_lcmv, apply_lcmv
@@ -25,7 +21,6 @@ epochs = mne.Epochs(raw, events, event_id, tmin, tmax,
 					reject=dict(grad=4000e-13, mag=4e-12, eog=150e-6))
 
 evoked = epochs.average()
-# evoked.plot_joint()
 del raw
 
 data_cov = mne.compute_covariance(epochs, tmin=0.01, tmax=0.25,
@@ -33,7 +28,6 @@ data_cov = mne.compute_covariance(epochs, tmin=0.01, tmax=0.25,
 noise_cov = mne.compute_covariance(epochs, tmin=tmin, tmax=0, 
 								method='empirical')
 
-# data_cov.plot(epochs.info)
 
 fwd_fname = data_path + '/MEG/sample/sample_audvis-meg-vol-7-fwd.fif'
 forward = mne.read_forward_solution(fwd_fname)
@@ -53,10 +47,6 @@ lims = [0.3, 0.45, 0.6]
 
 kwargs = dict(src=forward['src'], subject='sample', subjects_dir=subjects_dir, 
 			initial_time=0.087, verbose=True)
-
-fig = stc.plot(mode='stat_map', clim=dict(kind='value', pos_lims=lims), **kwargs)
-
+stc.plot(mode='stat_map', clim=dict(kind='value', pos_lims=lims), **kwargs)
 
 
-
-plt.show()
