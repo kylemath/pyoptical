@@ -258,7 +258,8 @@ def boxy2mne(*,boxy_file=None,mtg_file=None,coord_file=None):
     
     ###get our fiducials and transform matrix from fsaverage###
     subjects_dir = op.dirname(fetch_fsaverage())
-    fiducials = read_fiducials(subjects_dir + '\\fsaverage\\bem\\fsaverage-fiducials.fif')
+    fid_path = op.join(subjects_dir, 'fsaverage', 'bem', 'fsaverage-fiducials.fif')
+    fiducials = read_fiducials(fid_path)
     trans = coregister_fiducials(info, fiducials[0], tol=0.02)
     
     ###add data type and channel wavelength to info###
