@@ -20,20 +20,19 @@ path = os.getcwd()
 
 boxy_file = os.path.join(path, 'data', 'emm0311a.001')
 mtg_file = os.path.join(path, 'data', 'emm0311_good.mtg')
-coord_file = os.path.join(path, 'data', 'emm0311.elp')  
+coord_file = os.path.join(path, 'data', 'emm0311.elp')    
 
 raw_data = boxy2mne(boxy_file=boxy_file, mtg_file=mtg_file, coord_file=coord_file)
 
 ###grab only channels for each data type###
 ###get indices and labels for ac, dc, and ph###
-types = raw_data.info['chan_data_type']
-ac_indices = [i_index for i_index, x in enumerate(types) if x == "AC"]
-dc_indices = [i_index for i_index, x in enumerate(types) if x == "DC"]
-ph_indices = [i_index for i_index, x in enumerate(types) if x == "Ph"]
-mrk_index = types.index('Markers')
-ac_labels = [raw_data.info['ch_names'][idx] for idx in ac_indices]
-dc_labels = [raw_data.info['ch_names'][idx] for idx in dc_indices]
-ph_labels = [raw_data.info['ch_names'][idx] for idx in ph_indices]
+ac_labels = [i_label for i_label in raw_data.info['ch_names'] if 'AC' in i_label]
+dc_labels = [i_label for i_label in raw_data.info['ch_names'] if 'DC' in i_label]
+ph_labels = [i_label for i_label in raw_data.info['ch_names'] if 'Ph' in i_label]
+
+ac_indices =[i_index for i_index,i_label in enumerate(raw_data.info['ch_names']) if 'AC' in i_label]
+dc_indices =[i_index for i_index,i_label in enumerate(raw_data.info['ch_names']) if 'DC' in i_label]
+ph_indices =[i_index for i_index,i_label in enumerate(raw_data.info['ch_names']) if 'Ph' in i_label]
 
 ###grab our data###
 ###second may be better since it will return a raw object###
@@ -71,9 +70,9 @@ subjects_dir = op.dirname(fetch_fsaverage())
 
 fig = mne.viz.plot_alignment(
     # Plot options
-    show_axes=True, dig='fiducials', surfaces='head', mri_fiducials=True,
+    show_axes=True, dig=True, surfaces='head', mri_fiducials=True,
     subject='fsaverage', subjects_dir=subjects_dir, info=raw_data.info,
     coord_frame='head',
-    trans=raw_data.info['trans'],  # transform from head coords to fsaverage's MRI
+    # trans=raw_data.info['trans'],  # transform from head coords to fsaverage's MRI
     )
 set_3d_view(figure=fig, azimuth=135, elevation=80)
