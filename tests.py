@@ -39,13 +39,14 @@ dc_data, dc_times = raw_data.get_data(dc_indices, return_times=True)
 ph_data, ph_times = raw_data.get_data(ph_indices, return_times=True)
 
 ###also grab marker data in two ways###
+mrk_index = raw_data.info['ch_names'].index('Markers')
 mrk_data, mrk_times = raw_data.get_data(['Markers'], return_times=True)
 
 ###plot our data###
-raw_data.plot(n_channels = 5,duration = 500, scalings='auto', order = ac_indices)
-raw_data.plot(n_channels = 5,duration = 500, scalings='auto', order = dc_indices)
-raw_data.plot(n_channels = 5,duration = 500, scalings='auto', order = ph_indices)
-raw_data.plot(n_channels = 1,duration = 500, order = [mrk_index])
+# raw_data.plot(n_channels = 5,duration = 500, scalings='auto', order = ac_indices)
+# raw_data.plot(n_channels = 5,duration = 500, scalings='auto', order = dc_indices)
+# raw_data.plot(n_channels = 5,duration = 500, scalings='auto', order = ph_indices)
+# raw_data.plot(n_channels = 1,duration = 500, order = [mrk_index])
 
 ###calculate our distances (should be the same across data types###)
 dists_ac = mne.preprocessing.nirs.source_detector_distances(raw_data.info, picks = ac_indices)
