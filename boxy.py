@@ -35,11 +35,6 @@ def read_raw_boxy(fname, preload=False, verbose=None):
     """
     return RawBOXY(fname, preload, verbose)
 
-
-def _open(fname):
-    return open(fname, 'r', encoding='latin-1')
-
-
 @fill_doc
 class RawBOXY(BaseRaw):
     """Raw object from a BOXY optical imaging file.
