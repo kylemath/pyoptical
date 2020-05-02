@@ -67,9 +67,6 @@ class RawBOXY(BaseRaw):
         # Read participant information file
 
         # Store subject information from inf file in mne format
-        # Note: NIRX also records "Study Type", "Experiment History",
-        #       "Additional Notes", "Contact Information" and this information
-        #       is currently discarded
  
         # Read header file
         ###this keeps track of the line we're on###
@@ -291,9 +288,6 @@ class RawBOXY(BaseRaw):
         super(RawBOXY, self).__init__(
             info, preload, filenames=[fname], last_samps=[last_sample],
             raw_extras=[raw_extras], verbose=verbose)
-
-        
- 
  
     def _read_segment_file(self, data, idx, fi, start, stop, cals, mult):
         """Read a segment of data from a file.
@@ -373,7 +367,7 @@ class RawBOXY(BaseRaw):
                         ###save our data based on data type###
                         if data_types.index(i_data) == 0:
                             raw_ac[index_loc,:] = raw_data[channel][time_points].to_numpy()
-                        elif data_types.index(i_data) == 1:
+                        elif data_ty pes.index(i_data) == 1:
                             raw_dc[index_loc,:] = raw_data[channel][time_points].to_numpy()
                         elif data_types.index(i_data) == 2:
                             raw_ph[index_loc,:] = raw_data[channel][time_points].to_numpy()
