@@ -60,15 +60,8 @@ class RawBOXY(BaseRaw):
         from ...coreg import get_mni_fiducials  # avoid circular import prob
         logger.info('Loading %s' % fname)
 
-        # Check if required files exist and store names for later use
-
-        # Read number of rows/samples of wavelength data
-
-        # Read participant information file
-
-        # Store subject information from inf file in mne format
- 
         # Read header file
+        # Parse required header fields
         ###this keeps track of the line we're on###
         ###mostly to know the start and stop of data (probably an easier way)###
         line_num = 0
@@ -95,22 +88,6 @@ class RawBOXY(BaseRaw):
                     srate = float(i_line.rsplit(' ')[0])
                 elif '#DATA BEGINS' in i_line:
                     start_line = line_num
-
-        # Check that the file format version is supported
-
-        # Parse required header fields
-
-        # Extract frequencies of light used by machine
-
-        # Extract sampling rate
-
-        # Determine if short channels are present and on which detectors
-
-        # Determine requested channel indices
-        # The wl1 and wl2 files include all possible source - detector pairs.
-        # But most of these are not relevant. We want to extract only the
-        # subset requested in the probe file
-
 
         # Extract source-detectors
         ###set up some variables###
@@ -234,6 +211,23 @@ class RawBOXY(BaseRaw):
         all_chan_dict = dict(zip(all_labels,all_coords))
 
  
+        ###make our montage###
+        montage_orig = mne.channels.make_dig_montage(ch_pos=all_chan_dict,coord_frame='head',
+                                                nasion = fiducial_coords[0],
+                                                lpa = fiducial_coords[1], 
+                                                rpa = fiducial_coords[2])
+        
+        ###for some reason make_dig_montage put our channels in a different order than what we input###
+        ###let's fix that. should be fine to just change coords and ch_names###
+        for i_chan in range(len(all_coords)):
+            montage_orig.dig[i_chan+3]['r'] = all_coords[i_chan]
+            montage_orig.ch_names[i_chan] = all_labels[i_chan]
+        
+        ###add an extra channel for our triggers for later###
+        boxy_labels.append('Markers')
+
+        info = mne.create_info(boxy_labels,srate,ch_types='fnirs_raw')
+        info.update(dig=montage_orig.dig)
 
         # Set up digitization
         # These are all in MNI coordinates, so let's transform them to
@@ -262,8 +256,6 @@ class RawBOXY(BaseRaw):
 
         # Create mne structure
         ###create info structure###
-        ###add an extra channel for our triggers for later###
-        boxy_labels.append('Markers')
         info = mne.create_info(boxy_labels,srate,ch_types='fnirs_raw')
         ###add data type and channel wavelength to info###
         info.update(dig=montage_trans.dig, trans=trans)
